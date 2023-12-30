@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create_table_USER_DEVICE" author="Maria Musorina">
+        <createTable tableName="USER_DEVICE">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_device_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enter_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="device_info" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_connected" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="USER_DEVICE" baseColumnNames="user_device_id" constraintName="fk_user_device_user_login_data"
+                                 referencedTableName="USER_LOGIN_DATA"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
