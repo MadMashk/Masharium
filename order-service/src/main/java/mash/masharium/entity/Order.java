@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import mash.masharium.api.order.constant.OrderStatus;
+import mash.masharium.api.order.constant.OrderType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,6 +40,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    OrderType type;
+
     @OneToMany(mappedBy = "orderId", targetEntity = Position.class, orphanRemoval = true, fetch = FetchType.LAZY)
     Set<Position> positions;
 
@@ -53,5 +57,7 @@ public class Order {
 
     @Column(name = "is_paid")
     Boolean isPaid;
+
+    Boolean isAuth;
 
 }

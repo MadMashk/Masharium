@@ -1,6 +1,5 @@
 package mash.masharium.repository;
 
-import mash.masharium.api.order.constant.OrderStatus;
 import mash.masharium.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     List<Order> findAllByClientId(UUID clientId);
 
+    @Query(value = "select o.* from orders o where o.status not in ('DONE', 'CLOSED') or (o.status = 'DONE' and o.is_paid = false)", nativeQuery = true)
+    List<Order> findAllActive();
 }

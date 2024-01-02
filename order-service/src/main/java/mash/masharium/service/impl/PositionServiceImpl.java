@@ -40,7 +40,7 @@ public class PositionServiceImpl implements PositionService {
 
     @Override
     public Set<Position> calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(List<PositionRequestDto> positionRequestDtos, Set<Position> positions, Order order) {
-        return positionRepository.saveAll(positionRequestDtos
+        return new HashSet<>(positionRepository.saveAll(positionRequestDtos
                 .stream()
                 .peek(position -> {
                     Optional<Position> foundPosition = positions
@@ -56,7 +56,7 @@ public class PositionServiceImpl implements PositionService {
                     entity.setCost(position.getCost());
                     entity.setQuantity(position.getQuantity());
                     return entity;
-                }).collect(Collectors.toSet()));
+                }).collect(Collectors.toSet())));
     }
 
     private PositionResponseDto subtractRequest(Position position, PositionRequestDto dto) {

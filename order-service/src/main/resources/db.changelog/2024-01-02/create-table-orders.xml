@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="client_id" type="uuid">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="last_modified" type="TIMESTAMP WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
@@ -25,6 +25,8 @@
             <column name="total_price" type="decimal"/>
             <column name="is_paid" type="boolean"/>
             <column name="status" type="varchar"/>
+            <column name="type" type="varchar"/>
+            <column name="is_auth" type="boolean"/>
         </createTable>
     </changeSet>
 

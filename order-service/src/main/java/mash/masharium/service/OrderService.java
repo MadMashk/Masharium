@@ -26,4 +26,6 @@ public interface OrderService {
     OrderExpandedBonusInfoResponseDto getPaymentInfo(UUID orderId);
 
     void spendBonuses(UUID orderId, Integer amount);
+
+    List<OrderResponseDto> getAllActive();
 }
