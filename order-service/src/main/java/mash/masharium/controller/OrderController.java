@@ -45,22 +45,28 @@ public class OrderController {
     public void changeStatus(@RequestBody ChangeOrderStatusDto dto) {
         orderService.changeStatus(dto);
     }
-//payment
+
     @Operation(summary = "Оплата заказа", tags = "Заказы")
     @PostMapping("/payment")
     public void pay(@RequestParam UUID orderId) {
         orderService.pay(orderId);
     }
-//paymentInfo
+
     @Operation(summary = "Информация о заказе перед оплатой", tags = "Заказы")
     @GetMapping("/info")
     public OrderExpandedBonusInfoResponseDto getInfo(@RequestParam UUID orderId) {
         return orderService.getPaymentInfo(orderId);
     }
-//spendBonuses
+
     @Operation(summary = "Списать бонусы на заказ", tags = "Заказы")
     @PatchMapping("/bonuses")
     public void spendBonuses(@RequestParam UUID orderId, Integer amount) {
         orderService.spendBonuses(orderId, amount);
+    }
+
+    @Operation(summary = "Получение всех активных заказов", tags = "Заказы")
+    @GetMapping("/all-active")
+    public List<OrderResponseDto> getAllActive() {
+        return orderService.getAllActive();
     }
 }

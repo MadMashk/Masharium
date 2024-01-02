@@ -58,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setLastModified(LocalDateTime.now());
         order.setIsPaid(false);
+        order.setIsAuth(dto.getIsAuth());
         order.setAddress(dto.getAddress());
         order.setAppliedBonuses(BigDecimal.ZERO);
 
@@ -124,9 +125,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void pay(UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
-        BigDecimal bonusPercent = getBonusPercent();
+        BigDecimal bonusPercent = order.getIsAuth() ? getBonusPercent() : BigDecimal.ZERO;
         Integer totalAmountOfBonusesToAccrue = order.getTotalPrice().multiply(bonusPercent).intValue();
-        bonusService.accrual(order, totalAmountOfBonusesToAccrue);
+        if (Objects.equals(order.getIsAuth(), Boolean.TRUE)) {
+            bonusService.accrual(order, totalAmountOfBonusesToAccrue);
+        }
         order.setLastModified(LocalDateTime.now());
         order.setIsPaid(true);
     }
@@ -137,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
         OrderExpandedBonusInfoResponseDto responseDto = orderMapper.toDto(order);
-        BigDecimal bonusPercent = getBonusPercent();
+        BigDecimal bonusPercent = order.getIsAuth() ? getBonusPercent() : BigDecimal.ZERO;
         responseDto.setBonusesForOrder(order.getTotalPrice().multiply(bonusPercent).intValue());
         return responseDto;
     }
@@ -146,16 +149,24 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void spendBonuses(UUID orderId, Integer amount) {
         Order order = orderRepository.findById(orderId).orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
-        Integer bonusesInAccount = bonusService.getAccount(order.getClientId()).getBalance();
-        if (amount > bonusesInAccount) {
-            amount = bonusesInAccount;
+        if (Objects.equals(order.getIsAuth(), Boolean.TRUE)) {
+            Integer bonusesInAccount = bonusService.getAccount(order.getClientId()).getBalance();
+            if (amount > bonusesInAccount) {
+                amount = bonusesInAccount;
+            }
+            if (amount > order.getTotalPrice().intValue()) {
+                amount = order.getTotalPrice().intValue();
+            }
+            order.setTotalPrice(order.getTotalPrice().subtract(BigDecimal.valueOf(amount)));
+            order.setAppliedBonuses(order.getAppliedBonuses().add(BigDecimal.valueOf(amount)));
+            bonusService.writeOff(order, amount);
         }
-        if (amount > order.getTotalPrice().intValue()) {
-            amount = order.getTotalPrice().intValue();
-        }
-        order.setTotalPrice(order.getTotalPrice().subtract(BigDecimal.valueOf(amount)));
-        order.setAppliedBonuses(order.getAppliedBonuses().add(BigDecimal.valueOf(amount)));
-        bonusService.writeOff(order, amount);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getAllActive() {
+        return orderMapper.toListDto(orderRepository.findAllActive());
     }
 
     private void actAdditionalActionsDependingOnTheOrderStatus(ChangeOrderStatusDto dto, Order order) {

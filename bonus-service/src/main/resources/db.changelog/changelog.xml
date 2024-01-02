@@ -6,5 +6,6 @@
     <include file="2024-01-02/create-table-bonus_accounts.xml" relativeToChangelogFile="true"/>
     <include file="2024-01-02/create-table-bonus_operations.xml" relativeToChangelogFile="true"/>
     <include file="2024-01-02/create-table-parameters.xml" relativeToChangelogFile="true"/>
+    <include file="2024-01-02/insert-into-table-parameters.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

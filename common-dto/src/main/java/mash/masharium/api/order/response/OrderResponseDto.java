@@ -3,9 +3,9 @@ package mash.masharium.api.order.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import mash.masharium.api.order.constant.OrderStatus;
+import mash.masharium.api.order.constant.OrderType;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,8 +16,13 @@ public class OrderResponseDto {
 
     private UUID clientId;
 
+    private Boolean isAuth;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private OrderStatus status;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private OrderType type;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH-mm:ss")
     private LocalDateTime lastModified;
