@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
 
         roleService.createUserRoles(singUpRequest.roles(), userLoginData);
 
-        bonusServiceClient.createBonusAccount(new CreateBonusRequest(userLoginData.getId()));
+        bonusServiceClient.create(userLoginData.getId().toString());
 
         return new Jwt(jwtUtils.createToken(userDevice.getId()));
     }

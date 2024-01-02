@@ -89,6 +89,9 @@
         <module>authorization-service</module>
         <module>common-dto</module>
         <module>restaurant-service</module>
+        <module>order-service</module>
+        <module>kitchen-service</module>
+        <module>bonus-service</module>
     </modules>
 
 </project>

@@ -1,0 +1,43 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: POSTGRESQL
+    show-sql: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5431/order_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:masha}
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db.changelog/changelog.xml
+  #quartz properties
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 12
+          scheduler:
+            instanceId: AUTO
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+            tablePrefix: qrtz_
+            isClustered: false
+
+server:
+  port: 8081
+
+client-settings:
+  bonus-service-url: "localhost:8085"
+  kitchen-service-url: "localhost:8083"
+  restaurant-service-url: "localhost:8084"
