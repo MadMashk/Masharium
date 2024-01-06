@@ -1,25 +1,29 @@
-package mash.masharium.api.auth.response;
+package mash.masharium.api.restaurant.common;
+
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import mash.masharium.api.restaurant.constant.MeasureType;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDeviceInfo {
+public class ComponentDto {
 
     UUID id;
 
-    Instant enterDate;
+    String name;
 
-    String deviceInfo;
+    BigDecimal quantity;
 
-    Boolean isConnected;
+    MeasureType measureType;
+
+    BigDecimal price;
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create_table_menu_to_dish" author="Maria Musorina">
+        <createTable tableName="menu_to_dish">
+            <column name="dish_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="menu_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="menu_to_dish" baseColumnNames="dish_id"
+                                 constraintName="fk_menu_to_dish_dish"
+                                 referencedTableName="dish"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="menu_to_dish" baseColumnNames="menu_id"
+                                 constraintName="fk_menu_to_dish_menu"
+                                 referencedTableName="menu"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

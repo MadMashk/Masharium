@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog logicalFilePath="db.changelog/changelog.xml" xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+
+    <include file="2023-12-19/create_table_component.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_dish.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_menu.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_menu_to_dish_table.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_restaurant_table.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_table_reservation.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_table_client.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_dish_component.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_writing_off_operation.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_writing_off_operation_component.xml" relativeToChangelogFile="true"/>
+
+
+</databaseChangeLog>

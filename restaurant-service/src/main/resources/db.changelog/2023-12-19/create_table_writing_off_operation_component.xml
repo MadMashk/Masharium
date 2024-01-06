@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="create_table_writing_off_operation_components" author="Maria Musorina">
+        <createTable tableName="writing_off_operation_components">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="component_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="writing_off_operation_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="decimal">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_before" type="decimal">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_after" type="decimal">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="writing_off_operation_components" baseColumnNames="component_id"
+                                 constraintName="fk_writing_off_operation_components_to_component"
+                                 referencedTableName="component"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="writing_off_operation_components"
+                                 baseColumnNames="writing_off_operation_id"
+                                 constraintName="fk_writing_off_operation_components_to_writing_off_operation"
+                                 referencedTableName="writing_off_operation"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

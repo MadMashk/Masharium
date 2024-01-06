@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: POSTGRESQL
+    show-sql: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/restaurant_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:masha}
+  liquibase:
+    change-log: classpath:db.changelog/changelog.xml
+    enabled: true
+server:
+  port: 8084
