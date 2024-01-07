@@ -2,13 +2,15 @@ package mash.masharium.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.auth.common.Jwt;
+import mash.masharium.api.auth.common.UserDetailsDto;
+import mash.masharium.api.auth.constant.UserRoleType;
 import mash.masharium.api.auth.request.SignInRequest;
 import mash.masharium.api.auth.request.SingUpRequest;
-import mash.masharium.api.auth.response.TokenValidationResponse;
 import mash.masharium.api.bonus.request.CreateBonusRequest;
 import mash.masharium.entity.UserAccount;
 import mash.masharium.entity.UserDevice;
 import mash.masharium.entity.UserLoginData;
+import mash.masharium.entity.UserRole;
 import mash.masharium.exception.AuthValidationException;
 import mash.masharium.integration.client.BonusServiceClient;
 import mash.masharium.service.AuthService;
@@ -19,6 +21,8 @@ import mash.masharium.service.UserLoginDataService;
 import mash.masharium.utils.JwtUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -76,16 +80,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public TokenValidationResponse validateToken(Jwt token) {
+    public UserDetailsDto validateToken(Jwt token) {
         try {
             jwtUtils.validateToken(token.token());
-            userDeviceService.getByUUID(jwtUtils.getIdFromJWTToken(token.token()));
-
-            return new TokenValidationResponse(true);
-
+            UserDevice userDevice = userDeviceService.getByUUID(jwtUtils.getIdFromJWTToken(token.token()));
+            return getUserDetailsDto(userLoginDataService.getByDevice(userDevice));
         } catch (Exception e) {
             throw new AuthValidationException("Ошибка валидации токена");
         }
+    }
+
+    private UserDetailsDto getUserDetailsDto(UserLoginData userLoginData) { //todo mapper
+        UserDetailsDto userDetailsDto = new UserDetailsDto();
+        userDetailsDto.setUsername(userLoginData.getLogin());
+        userDetailsDto.setEmail(userLoginData.getUserAccount().getEmail());
+        userDetailsDto.setId(userLoginData.getId());
+        List<UserRoleType> userRoleTypes = userLoginData.getUserRoles().stream().map(UserRole::getUserRoleType).toList();
+        userDetailsDto.setUserRoleTypes(userRoleTypes);
+        return userDetailsDto;
     }
 
     @Override

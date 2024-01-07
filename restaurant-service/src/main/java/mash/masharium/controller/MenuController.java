@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mash.masharium.api.restaurant.request.MenuCreationRequest;
 import mash.masharium.api.restaurant.response.MenuResponse;
 import mash.masharium.service.MenuService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ public class MenuController {
     private final MenuService menuService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public UUID createMenu(@RequestBody MenuCreationRequest menuCreationRequest) {
         return menuService.createMenu(menuCreationRequest);
     }
@@ -33,11 +35,13 @@ public class MenuController {
     }
 
     @PostMapping("/{id}/dishes")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public MenuResponse addDishesToMenu(@RequestBody Set<UUID> dishesUuids, @PathVariable(name = "id") UUID menuId) {
         return menuService.addDishesToMenu(dishesUuids, menuId);
     }
 
     @DeleteMapping("/{id}/dishes")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public MenuResponse deleteDishesFromMenu(@RequestBody Set<UUID> dishesUuids, @PathVariable(name = "id") UUID menuId) {
         return menuService.removeDishesFromMenu(dishesUuids, menuId);
     }

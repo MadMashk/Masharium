@@ -9,6 +9,7 @@ import mash.masharium.api.restaurant.request.DishCreationRequest;
 import mash.masharium.api.restaurant.request.DishesComponentsWritingOffRequest;
 import mash.masharium.service.DishComponentService;
 import mash.masharium.service.DishService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +28,13 @@ public class DishController {
     private final DishComponentService dishComponentService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     List<DishDto> createDishes(@RequestBody List<DishCreationRequest> dishCreationRequests) {
         return dishService.createDishes(dishCreationRequests);
     }
 
     @PostMapping("/{id}/components")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     DishDto addComponentsToDish(@RequestBody List<DishComponentsCreationRequest> dishComponentsCreationRequests, @PathVariable(name = "id") UUID dishId) {
         return dishComponentService.addComponentsToDish(dishComponentsCreationRequests, dishId);
     }

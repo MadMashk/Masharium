@@ -2,9 +2,9 @@ package mash.masharium.controller;
 
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.auth.common.Jwt;
+import mash.masharium.api.auth.common.UserDetailsDto;
 import mash.masharium.api.auth.request.SignInRequest;
 import mash.masharium.api.auth.request.SingUpRequest;
-import mash.masharium.api.auth.response.TokenValidationResponse;
 import mash.masharium.service.AuthService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/validation")
-    public TokenValidationResponse validateUsersToken(@RequestBody Jwt jwt) {
+    public UserDetailsDto validateUsersToken(@RequestBody Jwt jwt) {
         return authService.validateToken(jwt);
     }
 
