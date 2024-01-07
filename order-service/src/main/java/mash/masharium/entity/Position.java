@@ -25,5 +25,7 @@ public class Position {
 
     UUID orderId;
 
+    UUID dishId;
+
     BigDecimal cost;
 }

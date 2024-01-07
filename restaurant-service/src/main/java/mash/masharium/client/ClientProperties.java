@@ -11,5 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "client-settings")
 public class ClientProperties {
     private String authServiceUrl;
+    private String orderServiceUrl;
 }
 

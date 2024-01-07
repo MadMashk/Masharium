@@ -15,6 +15,9 @@
             <column name="order_id" type="uuid">
                 <constraints nullable="false"/>
             </column>
+            <column name="dish_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
             <column name="cost" type="decimal"/>
         </createTable>
 

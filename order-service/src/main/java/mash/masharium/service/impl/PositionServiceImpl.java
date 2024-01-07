@@ -51,7 +51,7 @@ public class PositionServiceImpl implements PositionService {
                 })
                 .map(position -> {
                     Position entity = new Position();
-                    entity.setId(position.getId());
+                    entity.setDishId(position.getId());
                     entity.setOrderId(order.getId());
                     entity.setCost(position.getCost());
                     entity.setQuantity(position.getQuantity());

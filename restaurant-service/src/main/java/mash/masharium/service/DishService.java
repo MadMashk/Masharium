@@ -14,4 +14,6 @@ public interface DishService {
     List<Dish> getDishes(Set<UUID> uuids);
 
     List<DishDto> createDishes(List<DishCreationRequest> dish);
+
+    List<Dish> getAll();
 }

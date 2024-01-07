@@ -6,7 +6,10 @@ import mash.masharium.api.order.response.OrderResponseDto;
 import mash.masharium.api.order.response.PositionResponseDto;
 import mash.masharium.dto.OrderExpandedBonusInfoResponseDto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface OrderService {
@@ -28,4 +31,8 @@ public interface OrderService {
     void spendBonuses(UUID orderId, Integer amount);
 
     List<OrderResponseDto> getAllActive();
+
+    Map<LocalDate, BigDecimal> getVolumes(LocalDate firstDate, LocalDate secondDate);
+
+    Map<UUID, Integer> getFrequency(LocalDate firstDate, LocalDate secondDate);
 }

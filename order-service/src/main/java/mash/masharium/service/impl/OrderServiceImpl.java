@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
@@ -167,6 +168,41 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllActive() {
         return orderMapper.toListDto(orderRepository.findAllActive());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<LocalDate, BigDecimal> getVolumes(LocalDate firstDate, LocalDate secondDate) {
+        Map<LocalDate, BigDecimal> result = new TreeMap<>();
+        orderRepository.findAllPaidAndCompletedBetweenDates(firstDate.atStartOfDay(), secondDate.plusDays(1).atStartOfDay())
+                .forEach(order -> {
+                    LocalDateTime endTime = order.getEndTime();
+                    LocalDate localDate = LocalDate.of(endTime.getYear(), endTime.getMonth(), 1);
+                    if (result.containsKey(localDate)) {
+                        result.get(localDate);
+                    } else {
+                        result.put(localDate, order.getTotalPrice());
+                    }
+                });
+        return result;
+    }
+
+    @Override
+    public Map<UUID, Integer> getFrequency(LocalDate firstDate, LocalDate secondDate) {
+        Map<UUID, Integer> result = new HashMap<>();
+        List<Order> orders = orderRepository.findAllPaidAndCompletedBetweenDates(firstDate.atStartOfDay(), secondDate.plusDays(1).atStartOfDay());
+        orders
+                .stream()
+                .flatMap(order -> order.getPositions()
+                        .stream())
+                .forEach(position -> {
+                    if (result.containsKey(position.getDishId())) {
+                        result.put(position.getDishId(), result.get(position.getDishId()) + position.getQuantity());
+                    } else {
+                        result.put(position.getDishId(), position.getQuantity());
+                    }
+                });
+        return result;
     }
 
     private void actAdditionalActionsDependingOnTheOrderStatus(ChangeOrderStatusDto dto, Order order) {

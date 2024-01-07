@@ -11,7 +11,10 @@ import mash.masharium.dto.OrderExpandedBonusInfoResponseDto;
 import mash.masharium.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "Заказы")
@@ -68,5 +71,17 @@ public class OrderController {
     @GetMapping("/all-active")
     public List<OrderResponseDto> getAllActive() {
         return orderService.getAllActive();
+    }
+
+    @GetMapping("/volumes")
+    @Operation(hidden = true)
+    public Map<LocalDate, BigDecimal> getVolumesPerMonths(@RequestParam LocalDate firstDate, @RequestParam LocalDate secondDate) {
+        return orderService.getVolumes(firstDate, secondDate);
+    }
+
+    @GetMapping("/frequency")
+    @Operation(hidden = true)
+    public Map<UUID, Integer> getFrequency(LocalDate firstDate, LocalDate secondDate) {
+        return orderService.getFrequency(firstDate, secondDate);
     }
 }

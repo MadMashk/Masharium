@@ -9,6 +9,7 @@ import mash.masharium.mapper.DishMapper;
 import mash.masharium.repository.DishRepository;
 import mash.masharium.service.DishService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -42,5 +43,11 @@ public class DishServiceImp implements DishService {
     public List<DishDto> createDishes(List<DishCreationRequest> dishCreationRequests) {
         return dishMapper.dishesToDishDtos(dishRepository
                 .saveAll(dishMapper.mapDishCreationRequestToDish(dishCreationRequests)));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Dish> getAll() {
+        return dishRepository.findAll();
     }
 }
