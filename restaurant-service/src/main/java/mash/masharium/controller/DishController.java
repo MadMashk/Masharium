@@ -1,6 +1,7 @@
 package mash.masharium.controller;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.restaurant.common.ComponentDto;
 import mash.masharium.api.restaurant.common.DishDto;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/dishes")
+@Tag(name = "Блюда")
 public class DishController {
 
     private final DishService dishService;

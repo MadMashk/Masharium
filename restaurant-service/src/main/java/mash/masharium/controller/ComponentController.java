@@ -1,5 +1,6 @@
 package mash.masharium.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.restaurant.common.ComponentDto;
 import mash.masharium.api.restaurant.request.ComponentCreationRequest;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/components")
+@Tag(name = "Ингридиенты")
 public class ComponentController {
 
     private final ComponentService componentService;

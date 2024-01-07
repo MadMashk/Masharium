@@ -26,8 +26,8 @@ public class UserInfoServiceImpl implements UserService {
     private final UserInfoMapper userInfoMapper;
 
     @Override
-    public UserInfoResponse prepareUserInfos(Jwt jwt) {
-        UUID deviceId = jwtUtils.getIdFromJWTToken(jwt.token());
+    public UserInfoResponse prepareUserInfos(String jwt) {
+        UUID deviceId = jwtUtils.getIdFromJWTToken(jwt);
         UserLoginData userLoginData = userLoginDataService.getByDevice(userDeviceService.getByUUID(deviceId));
         List<UserDevice> userDeviceList = userLoginData.getUserDevice();
         UserAccount userAccount = userLoginData.getUserAccount();

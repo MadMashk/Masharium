@@ -16,4 +16,4 @@ jwt:
   jwt-secret: ${JWT_SECRET:secret}
   jwt-expiration-days: 0
 client-settings:
-  bonus-service-url: "localhost:8090"
+  bonus-service-url: "localhost:8085"

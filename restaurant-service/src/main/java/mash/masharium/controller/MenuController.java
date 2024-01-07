@@ -1,5 +1,6 @@
 package mash.masharium.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.restaurant.request.MenuCreationRequest;
 import mash.masharium.api.restaurant.response.MenuResponse;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/menus")
+@Tag(name = "Меню")
 public class MenuController {
 
     private final MenuService menuService;

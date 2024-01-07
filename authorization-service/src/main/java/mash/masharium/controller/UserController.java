@@ -18,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/info")
-    public UserInfoResponse getUserInfo(@RequestParam("jwt") Jwt jwt) {
+    public UserInfoResponse getUserInfo(@RequestParam("jwt") String jwt) {
         return userService.prepareUserInfos(jwt);
     }
 }

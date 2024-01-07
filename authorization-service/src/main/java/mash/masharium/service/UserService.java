@@ -5,6 +5,6 @@ import mash.masharium.api.auth.response.UserInfoResponse;
 
 public interface UserService {
 
-    UserInfoResponse prepareUserInfos(Jwt jwt);
+    UserInfoResponse prepareUserInfos(String jwt);
 
 }
