@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (StringUtils.isEmpty(header) || !StringUtils.startsWith(header, BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
-            throw new RuntimeException("token is invalid");
+            return;
         }
 
         String requestHeader = header.substring(BEARER_PREFIX.length());

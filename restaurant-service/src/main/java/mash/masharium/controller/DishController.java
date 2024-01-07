@@ -7,7 +7,7 @@ import mash.masharium.api.restaurant.common.ComponentDto;
 import mash.masharium.api.restaurant.common.DishDto;
 import mash.masharium.api.restaurant.request.DishComponentsCreationRequest;
 import mash.masharium.api.restaurant.request.DishCreationRequest;
-import mash.masharium.api.restaurant.request.DishesComponentsWritingOffRequest;
+import mash.masharium.api.restaurant.request.DishesComponentsQuantityChangingRequest;
 import mash.masharium.service.DishComponentService;
 import mash.masharium.service.DishService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,7 +42,11 @@ public class DishController {
     }
 
     @PostMapping("/components/writing-off")
-    public List<ComponentDto> writeOffComponentsOfDishes(@RequestBody DishesComponentsWritingOffRequest dishesComponentsWritingOffRequest){
-        return dishComponentService.writeOffDishesComponents(dishesComponentsWritingOffRequest);
+    public List<ComponentDto> writeOffComponentsOfDishes(@RequestBody DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest){
+        return dishComponentService.writeOffDishesComponents(dishesComponentsQuantityChangingRequest);
+    }
+    @PostMapping("/components/accrual")
+    public List<ComponentDto> accrualComponentsOfDishes(@RequestBody DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest){
+        return dishComponentService.accrualDishesComponents(dishesComponentsQuantityChangingRequest);
     }
 }

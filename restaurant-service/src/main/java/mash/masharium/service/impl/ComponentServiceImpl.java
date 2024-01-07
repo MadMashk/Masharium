@@ -2,16 +2,17 @@ package mash.masharium.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import mash.masharium.api.restaurant.common.ComponentDto;
+import mash.masharium.api.restaurant.constant.ComponentQuantityChangingOperationType;
 import mash.masharium.api.restaurant.request.ComponentCreationRequest;
 import mash.masharium.entity.Component;
-import mash.masharium.entity.ComponentWritingOffOperation;
-import mash.masharium.entity.WritingOffOperation;
+import mash.masharium.entity.ComponentQuantityChangingOperation;
+import mash.masharium.entity.ComponentQuantityChangingOperationComponent;
 import mash.masharium.exception.InvalidTransactionException;
 import mash.masharium.exception.NotFountException;
 import mash.masharium.mapper.ComponentMapper;
 import mash.masharium.repository.ComponentRepository;
+import mash.masharium.service.ComponentQuantityChangingOperationService;
 import mash.masharium.service.ComponentService;
-import mash.masharium.service.WritingOffOperationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BinaryOperator;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class ComponentServiceImpl implements ComponentService {
 
     private final ComponentRepository componentRepository;
     private final ComponentMapper componentMapper;
-    private final WritingOffOperationService writingOffOperationService;
+    private final ComponentQuantityChangingOperationService componentQuantityChangingOperationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -42,33 +44,55 @@ public class ComponentServiceImpl implements ComponentService {
                 .saveAll(componentMapper.mapComponentCreationRequestsToComponents(componentCreationRequests)));
     }
 
+
     @Override
     @Transactional
     public List<ComponentDto> writeOffComponents(Map<Component, BigDecimal> componentQuantityToWriteOffMap, UUID orderId) {
+        ComponentQuantityChangingOperation componentQuantityChangingOperation = componentQuantityChangingOperationService
+                .createComponentQuantityChangingOperation(orderId, ComponentQuantityChangingOperationType.WRITE_OFF);
+        return changeQuantity(componentQuantityToWriteOffMap, componentQuantityChangingOperation, BigDecimal::subtract);
 
-        WritingOffOperation writingOffOperation = writingOffOperationService.createWritingOffOperation(orderId);
+    }
+
+    @Override
+    @Transactional
+    public List<ComponentDto> accrualComponents(Map<Component, BigDecimal> componentQuantityToWriteOffMap, UUID orderId) {
+        ComponentQuantityChangingOperation componentQuantityChangingOperation = componentQuantityChangingOperationService
+                .createComponentQuantityChangingOperation(orderId, ComponentQuantityChangingOperationType.ACCRUAL);
+        return changeQuantity(componentQuantityToWriteOffMap, componentQuantityChangingOperation, BigDecimal::add);
+    }
+
+    private List<ComponentDto> changeQuantity(Map<Component, BigDecimal> componentQuantityToWriteOffMap,
+                                              ComponentQuantityChangingOperation componentQuantityChangingOperation,
+                                              BinaryOperator<BigDecimal> mathFunction) {
 
         return componentMapper.componentsToComponentDtos(componentQuantityToWriteOffMap.keySet().stream().peek(component -> {
             BigDecimal currentQuantity = component.getQuantity();
-            BigDecimal quantityToWriteOff = componentQuantityToWriteOffMap.get(component);
-            BigDecimal newQuantity = currentQuantity.subtract(quantityToWriteOff);
-            if (newQuantity.compareTo(BigDecimal.ZERO) < 1) {
+            BigDecimal quantityToChange = componentQuantityToWriteOffMap.get(component);
+            BigDecimal newQuantity = mathFunction.apply(currentQuantity, quantityToChange);
+
+            if (newQuantity.compareTo(BigDecimal.ZERO) < 1
+                    && componentQuantityChangingOperation.getChangingOperationType().equals(ComponentQuantityChangingOperationType.WRITE_OFF)) {
                 throw new InvalidTransactionException("Недостаточно компонентов на складе");
             }
-
             component.setQuantity(newQuantity);
             componentRepository.save(component);
 
-            ComponentWritingOffOperation componentWritingOffOperation = new ComponentWritingOffOperation();
-            componentWritingOffOperation.setQuantity(quantityToWriteOff);
-            componentWritingOffOperation.setQuantityBefore(currentQuantity);
-            componentWritingOffOperation.setQuantityAfter(newQuantity);
-            componentWritingOffOperation.setComponent(component);
-            componentWritingOffOperation.setWritingOffOperation(writingOffOperation);
-            writingOffOperationService.createComponentOfWritingOfOperation(componentWritingOffOperation);
+            createOperation(quantityToChange, currentQuantity, newQuantity, component, componentQuantityChangingOperation);
+
         }).toList());
 
 
+    }
+
+    private void createOperation(BigDecimal quantityToWriteOff, BigDecimal currentQuantity, BigDecimal newQuantity, Component component, ComponentQuantityChangingOperation componentQuantityChangingOperation) { //todo mapper
+        ComponentQuantityChangingOperationComponent componentQuantityChangingOperationComponent = new ComponentQuantityChangingOperationComponent();
+        componentQuantityChangingOperationComponent.setQuantity(quantityToWriteOff);
+        componentQuantityChangingOperationComponent.setQuantityBefore(currentQuantity);
+        componentQuantityChangingOperationComponent.setQuantityAfter(newQuantity);
+        componentQuantityChangingOperationComponent.setComponent(component);
+        componentQuantityChangingOperationComponent.setWritingOffOperation(componentQuantityChangingOperation);
+        componentQuantityChangingOperationService.createQuantityChangingOperationComponent(componentQuantityChangingOperationComponent);
     }
 
 }

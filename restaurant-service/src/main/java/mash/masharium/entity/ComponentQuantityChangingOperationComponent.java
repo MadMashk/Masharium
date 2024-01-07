@@ -25,9 +25,9 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "writing_off_operation_components")
+@Table(name = "quantity_changing_operation_components")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ComponentWritingOffOperation {
+public class ComponentQuantityChangingOperationComponent {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
@@ -37,8 +37,8 @@ public class ComponentWritingOffOperation {
     Component component;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writing_off_operation_id", referencedColumnName = "id", nullable = false)
-    WritingOffOperation writingOffOperation;
+    @JoinColumn(name = "component_quantity_changing_operation_id", referencedColumnName = "id", nullable = false)
+    ComponentQuantityChangingOperation writingOffOperation;
 
     @Column(name = "quantity", nullable = false)
     BigDecimal quantity;

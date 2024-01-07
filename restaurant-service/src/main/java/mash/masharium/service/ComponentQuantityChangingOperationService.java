@@ -1,0 +1,17 @@
+package mash.masharium.service;
+
+
+import mash.masharium.api.restaurant.constant.ComponentQuantityChangingOperationType;
+import mash.masharium.entity.ComponentQuantityChangingOperation;
+import mash.masharium.entity.ComponentQuantityChangingOperationComponent;
+
+import java.util.UUID;
+
+public interface ComponentQuantityChangingOperationService {
+
+    ComponentQuantityChangingOperationComponent createQuantityChangingOperationComponent(ComponentQuantityChangingOperationComponent componentWritingOffOperation);
+
+    ComponentQuantityChangingOperation createComponentQuantityChangingOperation(UUID orderId, ComponentQuantityChangingOperationType componentQuantityChangingOperationType);
+
+
+}

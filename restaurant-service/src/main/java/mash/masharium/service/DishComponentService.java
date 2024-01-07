@@ -4,7 +4,7 @@ import mash.masharium.api.restaurant.common.ComponentDto;
 import mash.masharium.api.restaurant.common.DishAvailability;
 import mash.masharium.api.restaurant.common.DishDto;
 import mash.masharium.api.restaurant.request.DishComponentsCreationRequest;
-import mash.masharium.api.restaurant.request.DishesComponentsWritingOffRequest;
+import mash.masharium.api.restaurant.request.DishesComponentsQuantityChangingRequest;
 import mash.masharium.entity.Dish;
 
 import java.util.List;
@@ -15,5 +15,7 @@ public interface DishComponentService {
 
     List<DishAvailability> computeDishesAvailability(List<Dish> dishes);
 
-    List<ComponentDto> writeOffDishesComponents(DishesComponentsWritingOffRequest dishesComponentsWritingOffRequest);
+    List<ComponentDto> writeOffDishesComponents(DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest);
+
+    List<ComponentDto> accrualDishesComponents(DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest);
 }

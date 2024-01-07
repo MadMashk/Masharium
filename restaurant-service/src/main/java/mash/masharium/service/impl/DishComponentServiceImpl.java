@@ -6,7 +6,7 @@ import mash.masharium.api.restaurant.common.DishAvailability;
 import mash.masharium.api.restaurant.common.DishDto;
 import mash.masharium.api.restaurant.constant.DishStatus;
 import mash.masharium.api.restaurant.request.DishComponentsCreationRequest;
-import mash.masharium.api.restaurant.request.DishesComponentsWritingOffRequest;
+import mash.masharium.api.restaurant.request.DishesComponentsQuantityChangingRequest;
 import mash.masharium.entity.Component;
 import mash.masharium.entity.Dish;
 import mash.masharium.entity.DishComponent;
@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,21 +64,30 @@ public class DishComponentServiceImpl implements DishComponentService {
     }
 
     @Override
-    public List<ComponentDto> writeOffDishesComponents(DishesComponentsWritingOffRequest dishesComponentsWritingOffRequest) {
-        List<Dish> dishes = dishService.getDishes(dishesComponentsWritingOffRequest.getDishesQuantityMap().keySet());
+    public List<ComponentDto> accrualDishesComponents(DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest) {
+        return componentsDishesQuantityChangingPreparation(this.componentService::accrualComponents, dishesComponentsQuantityChangingRequest);
+    }
 
-        if (!Objects.equals(dishes.size(), dishesComponentsWritingOffRequest.getDishesQuantityMap().entrySet().size())) {
+    @Override
+    public List<ComponentDto> writeOffDishesComponents(DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest) {
+        return componentsDishesQuantityChangingPreparation(this.componentService::writeOffComponents, dishesComponentsQuantityChangingRequest);
+    }
+
+
+    private List<ComponentDto> componentsDishesQuantityChangingPreparation(BiFunction<Map<Component, BigDecimal>, UUID, List<ComponentDto>> quantityChangingFunction,
+                                                                           DishesComponentsQuantityChangingRequest dishesComponentsQuantityChangingRequest) {
+        List<Dish> dishes = dishService.getDishes(dishesComponentsQuantityChangingRequest.getDishesQuantityMap().keySet());
+
+        if (!Objects.equals(dishes.size(), dishesComponentsQuantityChangingRequest.getDishesQuantityMap().entrySet().size())) {
             throw new NotFountException(DishRepository.ERROR_MESSAGE);
         }
-
         return dishes.stream().flatMap(dish ->
-                componentService
-                        .writeOffComponents(dish.getDishComponents().stream()
+                quantityChangingFunction.apply(dish.getDishComponents().stream()
                                         .collect(Collectors.toMap(DishComponent::getComponent,
                                                 dishComponent -> dishComponent.getQuantity()
-                                                        .multiply(BigDecimal.valueOf(dishesComponentsWritingOffRequest.getDishesQuantityMap()
+                                                        .multiply(BigDecimal.valueOf(dishesComponentsQuantityChangingRequest.getDishesQuantityMap()
                                                                 .get(dish.getId()))))),
-                                dishesComponentsWritingOffRequest.getOrderId())
+                                dishesComponentsQuantityChangingRequest.getOrderId())
                         .stream()
         ).toList();
     }

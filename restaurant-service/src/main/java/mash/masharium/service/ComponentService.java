@@ -15,4 +15,6 @@ public interface ComponentService {
     List<ComponentDto> createComponents(List<ComponentCreationRequest> componentCreationRequest);
 
     List<ComponentDto> writeOffComponents(Map<Component, BigDecimal> componentQuantityToWriteOffMap, UUID orderId);
+
+    List<ComponentDto> accrualComponents(Map<Component, BigDecimal> componentQuantityToWriteOffMap, UUID orderId);
 }

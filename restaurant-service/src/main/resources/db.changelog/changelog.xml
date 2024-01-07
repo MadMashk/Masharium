@@ -12,8 +12,8 @@
     <include file="2023-12-19/create_table_table_reservation.xml" relativeToChangelogFile="true"/>
     <include file="2023-12-19/create_table_table_client.xml" relativeToChangelogFile="true"/>
     <include file="2023-12-19/create_table_dish_component.xml" relativeToChangelogFile="true"/>
-    <include file="2023-12-19/create_table_writing_off_operation.xml" relativeToChangelogFile="true"/>
-    <include file="2023-12-19/create_table_writing_off_operation_component.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_component_quantity_changing_operation.xml" relativeToChangelogFile="true"/>
+    <include file="2023-12-19/create_table_quantity_changing_operation_components.xml" relativeToChangelogFile="true"/>
 
 
 </databaseChangeLog>

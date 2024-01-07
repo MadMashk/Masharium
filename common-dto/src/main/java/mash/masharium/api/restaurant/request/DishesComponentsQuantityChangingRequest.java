@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DishesComponentsWritingOffRequest {
+public class DishesComponentsQuantityChangingRequest {
     UUID orderId;
     Map<UUID, Integer> dishesQuantityMap;
 }
