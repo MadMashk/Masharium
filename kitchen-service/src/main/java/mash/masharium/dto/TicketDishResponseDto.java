@@ -13,4 +13,6 @@ public class TicketDishResponseDto {
 
     private UUID dishId;
 
+    private Integer quantity;
+
 }

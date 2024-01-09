@@ -11,13 +11,13 @@ import java.util.UUID;
 @FeignClient(value = "bonus-accounts", url = "#{clientProperties.bonusServiceUrl}")
 public interface BonusServiceClient {
 
-    @PostMapping("/writing-off")
+    @PostMapping("/bonus-accounts/writing-off")
     void writeOff(@RequestParam UUID userId, @RequestParam UUID orderId, @RequestParam Integer summa);
 
-    @PostMapping("/accrual")
+    @PostMapping("/bonus-accounts/accrual")
     void accrual(@RequestParam UUID userId, @RequestParam UUID orderId, @RequestParam Integer summa);
 
-    @GetMapping
+    @GetMapping("/bonus-accounts")
     BonusAccountResponseDto getAccount(@RequestParam UUID userId);
 
 }

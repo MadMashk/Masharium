@@ -29,6 +29,9 @@ public class Order {
     @Column(name = "client_id")
     UUID clientId;
 
+    @Column(name = "waiter_id")
+    UUID waiterId;
+
     LocalDateTime lastModified;
 
     LocalDateTime creationTime;
@@ -57,7 +60,5 @@ public class Order {
 
     @Column(name = "is_paid")
     Boolean isPaid;
-
-    Boolean isAuth;
 
 }

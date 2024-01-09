@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface PositionRepository extends JpaRepository<Position, UUID> {
 
+    void deleteByDishId(UUID id);
 }

@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class OrderExceptionHandler {
 
     @ExceptionHandler(value = {OrderServiceException.class})
-    public ResponseEntity<BaseResponse<Void>> handleAppException(OrderServiceException e) {
-        return new ResponseEntity<>(BaseResponseUtils.getUnsuccessfulBaseResponse(new Error(e.getMessage())), e.httpStatus);
+    public ResponseEntity<String> handleAppException(OrderServiceException e) {
+        return new ResponseEntity<>(e.getMessage(), e.httpStatus);
     }
 
     @ExceptionHandler(value = {RuntimeException.class})
-    public ResponseEntity<BaseResponse<Void>> handleRuntimeException(RuntimeException runtimeException) {
+    public ResponseEntity<String> handleRuntimeException(RuntimeException runtimeException) {
         log.info("Error ", runtimeException);
-        return new ResponseEntity<>(BaseResponseUtils.getUnsuccessfulBaseResponse(new Error("Во время обработки запроса возникла ошибка")), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(("Во время обработки запроса возникла ошибка"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

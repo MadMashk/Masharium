@@ -1,49 +1,84 @@
 version: "3.3"
 services:
+  auth:
+    build: authorization-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - account_db
   account_db:
     container_name: auth_db
     image: postgres:latest
     environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5430/auth_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=auth_db
     ports:
       - "5430:5432"
 
+  order:
+    build: order-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - order_db
   order_db:
     container_name: order_db
     image: postgres:latest
     environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5431/order_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=order_db
     ports:
       - "5431:5432"
 
+  kitchen:
+    build: kitchen-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kitchen_db
   kitchen_db:
     container_name: kitchen_db
     image: postgres:latest
     environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5433/kitchen_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=kitchen_db
     ports:
       - "5433:5432"
 
+  restaurant:
+    build: restaurant-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - restaurant_db
   restaurant_db:
     container_name: restaurant_db
     image: postgres:latest
     environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5434/restaurant_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=restaurant_db
     ports:
       - "5434:5432"
 
+  bonus:
+    build: bonus-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - bonus_db
   bonus_db:
     container_name: bonus_db
     image: postgres:latest
     environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5435/bonus_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=bonus_db

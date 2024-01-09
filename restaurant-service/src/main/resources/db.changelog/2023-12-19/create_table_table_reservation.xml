@@ -12,7 +12,13 @@
             <column name="restaurant_table_id" type="uuid">
                 <constraints nullable="false"/>
             </column>
-            <column name="reservation_date" type="date">
+            <column name="reservation_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reservation_end" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar">
                 <constraints nullable="false"/>
             </column>
         </createTable>

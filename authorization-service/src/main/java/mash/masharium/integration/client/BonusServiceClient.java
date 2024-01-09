@@ -9,7 +9,7 @@ import java.util.UUID;
 @FeignClient(value = "bonus-accounts", url = "#{clientProperties.bonusServiceUrl}")
 public interface BonusServiceClient {
 
-    @PostMapping
+    @PostMapping("/bonus-accounts")
     UUID create(@RequestParam String userId);
 
 }

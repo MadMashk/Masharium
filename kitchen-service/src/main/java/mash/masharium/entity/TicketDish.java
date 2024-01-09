@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "TICKET_DISH")
+@Table(name = "ticket_dishes")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketDish {
 
@@ -26,4 +26,6 @@ public class TicketDish {
 
     @Column(name = "dish_id")
     UUID dishId;
+
+    Integer quantity;
 }

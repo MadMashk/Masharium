@@ -19,6 +19,7 @@ import java.util.UUID;
 public class Position {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
     Integer quantity;

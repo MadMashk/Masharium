@@ -1,5 +1,6 @@
 package mash.masharium.service;
 
+import java.io.FileOutputStream;
 import java.time.LocalDate;
 
 public interface ReportService {
@@ -10,4 +11,5 @@ public interface ReportService {
 
     byte[] getExpectedDishNumbers(Integer quantityOfMonthsForAnalyzeStatistic);
 
+    byte[] getExpectedProductVolumes(Integer quantityOfMonthsToAnalyze);
 }

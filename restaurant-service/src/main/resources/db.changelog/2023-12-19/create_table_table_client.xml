@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="uuid">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="table_reservation_id" type="uuid">
                 <constraints nullable="false"/>

@@ -1,6 +1,7 @@
 package mash.masharium.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import mash.masharium.api.kitchen.TicketDishRequestDto;
 import mash.masharium.api.kitchen.TicketRequestDto;
 import mash.masharium.entity.Order;
 import mash.masharium.entity.Position;
@@ -18,9 +19,11 @@ public class KitchenServiceImpl implements KitchenService {
     public void createTicket(Order order) {
         TicketRequestDto ticketRequestDto = new TicketRequestDto();
         ticketRequestDto.setOrderId(order.getId());
-        ticketRequestDto.setDishIds(order.getPositions()
+        ticketRequestDto.setDishes(order.getPositions()
                 .stream()
-                .map(Position::getId)
+                .map(position -> new TicketDishRequestDto(
+                            position.getDishId(),
+                            position.getQuantity()))
                 .toList());
         kitchenServiceClient.create(ticketRequestDto);
     }

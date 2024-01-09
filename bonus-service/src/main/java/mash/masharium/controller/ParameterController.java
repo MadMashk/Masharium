@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Tag(name = "Параметры настроек")
-@RestController("/parameters")
+@RestController
+@RequestMapping("/parameters")
 @RequiredArgsConstructor
 public class ParameterController {
 

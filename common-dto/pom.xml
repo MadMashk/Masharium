@@ -7,16 +7,16 @@
     <artifactId>common-dto</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-
+    <properties>
+        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
+    </properties>
     <parent>
         <groupId>mash.masharium</groupId>
         <artifactId>masharium</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-
     <packaging>jar</packaging>
-
 
     <dependencies>
         <dependency>
@@ -28,6 +28,4 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
     </dependencies>
-
-
 </project>

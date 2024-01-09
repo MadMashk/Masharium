@@ -16,5 +16,8 @@ public interface OrderServiceClient {
     Map<LocalDate, BigDecimal> getVolumesPerMonths(@RequestParam LocalDate firstDate, @RequestParam LocalDate secondDate);
 
     @GetMapping("/orders/frequency")
-    Map<UUID, Integer> getFrequency(LocalDate firstDate, LocalDate secondDate);
+    Map<UUID, Integer> getFrequency(@RequestParam LocalDate firstDate,@RequestParam LocalDate secondDate);
+
+    @GetMapping("/orders/volumes-per-day")
+    Map<UUID, Integer> getVolumesPerDay(@RequestParam LocalDate firstDate, @RequestParam LocalDate secondDate);
 }

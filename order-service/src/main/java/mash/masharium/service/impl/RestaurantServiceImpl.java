@@ -24,8 +24,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantServiceClient restaurantServiceClient;
 
     @Override
-    public void writeOffComponentsOfPositions(Order order, List<PositionRequestDto> positionRequestDtoList) {
-        writeOffPositions(order.getId(), positionRequestDtoList);
+    public void writeOffComponentsOfPositions(Order order, Map<UUID, Integer> quantities) {
+        writeOffPositions(order.getId(), quantities);
     }
 
     @Override
@@ -42,13 +42,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         return order.getPositions().stream().collect(Collectors.toMap(Position::getId, Position::getQuantity));
     }
 
-    private void writeOffPositions(UUID orderId, List<PositionRequestDto> positionRequestDtos) {
+    private void writeOffPositions(UUID orderId, Map<UUID, Integer> quantities) {
         DishesComponentsQuantityChangingRequest request = new DishesComponentsQuantityChangingRequest();
         request.setOrderId(orderId);
-        request.setDishesQuantityMap(positionRequestDtos
-                .stream()
-                .collect(Collectors.toMap(PositionRequestDto::getId, PositionRequestDto::getQuantity)));
-        sendRequest(request);
+        request.setDishesQuantityMap(quantities);
+        sendWriteOffRequest(request);
     }
 
     private void accrualPositions(UUID orderId, List<PositionResponseDto> positionRequestDtos) {
@@ -57,17 +55,21 @@ public class RestaurantServiceImpl implements RestaurantService {
         request.setDishesQuantityMap(positionRequestDtos
                 .stream()
                 .collect(Collectors.toMap(PositionResponseDto::getId, PositionResponseDto::getQuantity)));
-        sendRequest(request);
+        sendAccrualRequest(request);
     }
 
     private void accrualPositions(UUID orderId, Map<UUID, Integer> positions) {
         DishesComponentsQuantityChangingRequest request = new DishesComponentsQuantityChangingRequest();
         request.setOrderId(orderId);
         request.setDishesQuantityMap(positions);
-        sendRequest(request);
+        sendAccrualRequest(request);
     }
 
-    private void sendRequest(DishesComponentsQuantityChangingRequest request) {
+    private void sendWriteOffRequest(DishesComponentsQuantityChangingRequest request) {
+        restaurantServiceClient.writeOffComponentsOfDishes(request);
+    }
+
+    private void sendAccrualRequest(DishesComponentsQuantityChangingRequest request) {
         restaurantServiceClient.accrualComponentsOfDishes(request);
     }
 }

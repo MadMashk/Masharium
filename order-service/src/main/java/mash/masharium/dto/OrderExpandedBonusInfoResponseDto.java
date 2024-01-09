@@ -2,10 +2,7 @@ package mash.masharium.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
+import mash.masharium.api.order.response.OrderResponseDto;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

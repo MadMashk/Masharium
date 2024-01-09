@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,5 +42,9 @@ public class TableReservation {
     List<TableClient> tableClients;
 
     @Column(name = "reservation_date", nullable = false)
-    Instant reservationDate;
+    LocalDateTime reservationDate;
+
+    LocalDateTime reservationEnd;
+
+    String name;
 }

@@ -10,5 +10,5 @@ public class TicketRequestDto {
 
     private UUID orderId;
 
-    private List<UUID> dishIds;
+    private List<TicketDishRequestDto> dishes;
 }
