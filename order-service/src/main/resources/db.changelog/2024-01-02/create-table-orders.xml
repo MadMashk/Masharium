@@ -12,6 +12,9 @@
             <column name="client_id" type="uuid">
                 <constraints nullable="true"/>
             </column>
+            <column name="waiter_id" type="uuid">
+                <constraints nullable="true"/>
+            </column>
             <column name="last_modified" type="TIMESTAMP WITHOUT TIME ZONE">
                 <constraints nullable="false"/>
             </column>
@@ -26,7 +29,6 @@
             <column name="is_paid" type="boolean"/>
             <column name="status" type="varchar"/>
             <column name="type" type="varchar"/>
-            <column name="is_auth" type="boolean"/>
         </createTable>
     </changeSet>
 

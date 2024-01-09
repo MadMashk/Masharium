@@ -1,16 +1,19 @@
 package mash.masharium.service.impl;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mash.masharium.api.bonus.constant.BonusServiceConfigParameters;
 import mash.masharium.api.order.constant.OrderStatus;
 import mash.masharium.api.order.request.ChangeOrderStatusDto;
 import mash.masharium.api.order.request.OrderRequestDto;
+import mash.masharium.api.order.request.PositionRequestDto;
 import mash.masharium.api.order.response.OrderResponseDto;
 import mash.masharium.api.order.response.PositionResponseDto;
 import mash.masharium.dto.OrderExpandedBonusInfoResponseDto;
 import mash.masharium.entity.Order;
 import mash.masharium.entity.Position;
+import mash.masharium.exception.model.ForbiddenException;
 import mash.masharium.exception.model.NotFoundException;
 import mash.masharium.mapper.OrderMapper;
 import mash.masharium.repository.OrderRepository;
@@ -22,9 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,29 +53,19 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void createOrUpdate(OrderRequestDto dto) {
-        Optional<Order> optionalOrder = orderRepository.findByClientIdAndStatus(dto.getClientId(), OrderStatus.DRAFT.name());
-        Order order;
-        if (optionalOrder.isPresent()) {
-            order = optionalOrder.get();
-            removeQuartzTrigger(order);
-        } else {
-            order = generateOrder(dto);
-        }
-        order.setLastModified(LocalDateTime.now());
-        order.setIsPaid(false);
-        order.setIsAuth(dto.getIsAuth());
-        order.setAddress(dto.getAddress());
-        order.setAppliedBonuses(BigDecimal.ZERO);
+        Order order = getOrder(dto);
+        Map<UUID, Integer> quantities = dto.getPositions()
+                .stream()
+                .collect(Collectors.toMap(PositionRequestDto::getId, PositionRequestDto::getQuantity));
 
-        Set<Position> orderPositions = orderRepository.save(order).getPositions();
-
-        orderPositions.addAll(positionService.calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(dto.getPositions(), orderPositions, order));
+        order.getPositions().addAll(positionService.calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(dto.getPositions(), order));
 
         orderRepository.save(order);
+
         calculatePrice(order);
         createQuartzTrigger(order);
         //списываем ингридиенты для блюд
-        restaurantService.writeOffComponentsOfPositions(order, dto.getPositions());
+        restaurantService.writeOffComponentsOfPositions(order, quantities);
     }
 
     @Override
@@ -82,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<PositionResponseDto> positionResponseDtos = positionService.subtract(dto.getPositions(), order);
 
+        orderRepository.save(order);
         calculatePrice(order);
 
         //возвращаем ингридиенты удаленных блюд на склад
@@ -104,6 +100,7 @@ public class OrderServiceImpl implements OrderService {
         );
         actAdditionalActionsDependingOnTheOrderStatus(dto, order);
         order.setStatus(dto.getOrderStatus());
+        order.setLastModified(LocalDateTime.now());
         orderRepository.save(order);
     }
 
@@ -125,9 +122,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void pay(UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
-        BigDecimal bonusPercent = order.getIsAuth() ? getBonusPercent() : BigDecimal.ZERO;
+        BigDecimal bonusPercent = Objects.nonNull(order.getClientId()) ? getBonusPercent() : BigDecimal.ZERO;
         Integer totalAmountOfBonusesToAccrue = order.getTotalPrice().multiply(bonusPercent).intValue();
-        if (Objects.equals(order.getIsAuth(), Boolean.TRUE)) {
+        if (Objects.nonNull(order.getClientId())) {
             bonusService.accrual(order, totalAmountOfBonusesToAccrue);
         }
         order.setLastModified(LocalDateTime.now());
@@ -140,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
         OrderExpandedBonusInfoResponseDto responseDto = orderMapper.toDto(order);
-        BigDecimal bonusPercent = order.getIsAuth() ? getBonusPercent() : BigDecimal.ZERO;
+        BigDecimal bonusPercent = Objects.nonNull(order.getClientId()) ? getBonusPercent() : BigDecimal.ZERO;
         responseDto.setBonusesForOrder(order.getTotalPrice().multiply(bonusPercent).intValue());
         return responseDto;
     }
@@ -149,7 +146,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void spendBonuses(UUID orderId, Integer amount) {
         Order order = orderRepository.findById(orderId).orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
-        if (Objects.equals(order.getIsAuth(), Boolean.TRUE)) {
+        if (Objects.isNull(order.getClientId())) {
+            throw new ForbiddenException("Доступно только авторизованным пользователям");
+        }
             Integer bonusesInAccount = bonusService.getAccount(order.getClientId()).getBalance();
             if (amount > bonusesInAccount) {
                 amount = bonusesInAccount;
@@ -160,7 +159,6 @@ public class OrderServiceImpl implements OrderService {
             order.setTotalPrice(order.getTotalPrice().subtract(BigDecimal.valueOf(amount)));
             order.setAppliedBonuses(order.getAppliedBonuses().add(BigDecimal.valueOf(amount)));
             bonusService.writeOff(order, amount);
-        }
     }
 
     @Override
@@ -169,20 +167,76 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toListDto(orderRepository.findAllActive());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Map<LocalDate, BigDecimal> getVolumes(LocalDate firstDate, LocalDate secondDate) {
+        Map<LocalDate, BigDecimal> result = new TreeMap<>();
+        orderRepository.findAllPaidAndCompletedBetweenDates(firstDate.atStartOfDay(), secondDate.plusDays(1).atStartOfDay())
+                .forEach(order -> {
+                    LocalDateTime endTime = order.getEndTime();
+                    LocalDate localDate = LocalDate.of(endTime.getYear(), endTime.getMonth(), 1);
+                    if (result.containsKey(localDate)) {
+                        result.put(localDate, result.get(localDate).add(order.getTotalPrice()));
+                    } else {
+                        result.put(localDate, order.getTotalPrice());
+                    }
+                });
+        return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Integer> getFrequency(LocalDate firstDate, LocalDate secondDate) {
+        Map<UUID, Integer> result = new HashMap<>();
+        orderRepository.findAllPaidAndCompletedBetweenDates(firstDate.atStartOfDay(), secondDate.plusDays(1).atStartOfDay())
+                .stream()
+                .flatMap(order -> order.getPositions()
+                        .stream())
+                .forEach(position -> {
+                    if (result.containsKey(position.getDishId())) {
+                        result.put(position.getDishId(), result.get(position.getDishId()) + position.getQuantity());
+                    } else {
+                        result.put(position.getDishId(), position.getQuantity());
+                    }
+                });
+        return result;
+    }
+
+    private Order getOrder(OrderRequestDto dto) {
+        Order order;
+        Optional<Order> optionalOrder = orderRepository.findByClientIdOrWaiterIdAndStatus(dto.getClientId(), dto.getWaiterId(), OrderStatus.DRAFT);
+        if (optionalOrder.isPresent()) {
+            order = optionalOrder.get();
+            removeQuartzTrigger(order);
+        } else {
+            order = generateOrder(dto);
+        }
+        order.setLastModified(LocalDateTime.now());
+        order.setIsPaid(false);
+        order.setAddress(dto.getAddress());
+        order.setType(dto.getType());
+        order.setAppliedBonuses(BigDecimal.ZERO);
+        orderRepository.save(order);
+        return order;
+    }
+
     private void actAdditionalActionsDependingOnTheOrderStatus(ChangeOrderStatusDto dto, Order order) {
-        switch (dto.getOrderStatus()) {
-            case CONFIRMED -> {
-                removeQuartzTrigger(order);
-                //создаем тикет на сервисе кухни
-                kitchenService.createTicket(order);
-            }
-            case CLOSED -> {
-                order.setEndTime(LocalDateTime.now());
-                restaurantService.accrualComponentsOfPositions(order);
-            }
-            case DONE -> {
-                order.setIsPaid(Boolean.TRUE);
-                order.setEndTime(LocalDateTime.now());
+        if (!Objects.equals(dto.getOrderStatus(), order.getStatus())) {
+            switch (dto.getOrderStatus()) {
+                case CONFIRMED -> {
+                    removeQuartzTrigger(order);
+                    //создаем тикет на сервисе кухни
+                    kitchenService.createTicket(order);
+                }
+                case CLOSED -> {
+                    order.setEndTime(LocalDateTime.now());
+                    //возвращаем ингридиенты блюд
+                    restaurantService.accrualComponentsOfPositions(order);
+                }
+                case DONE -> {
+                    order.setIsPaid(Boolean.TRUE);
+                    order.setEndTime(LocalDateTime.now());
+                }
             }
         }
     }
@@ -213,6 +267,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCreationTime(LocalDateTime.now());
         order.setPositions(new HashSet<>());
         order.setClientId(dto.getClientId());
+        order.setWaiterId(dto.getWaiterId());
         order.setStatus(OrderStatus.DRAFT);
         return order;
     }

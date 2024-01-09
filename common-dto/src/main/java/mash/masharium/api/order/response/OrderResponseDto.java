@@ -5,6 +5,7 @@ import lombok.Data;
 import mash.masharium.api.order.constant.OrderStatus;
 import mash.masharium.api.order.constant.OrderType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -36,4 +37,12 @@ public class OrderResponseDto {
     private String address;
 
     private Set<PositionResponseDto> positions;
+
+    private Boolean isPaid;
+
+    private BigDecimal fullPrice;
+
+    private BigDecimal totalPrice;
+
+    private BigDecimal appliedBonuses;
 }

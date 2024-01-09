@@ -16,3 +16,4 @@ server:
   port: 8084
 client-settings:
   auth-service-url: "localhost:8080"
+  order-service-url: "localhost:8081"

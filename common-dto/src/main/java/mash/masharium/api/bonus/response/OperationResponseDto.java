@@ -1,5 +1,6 @@
 package mash.masharium.api.bonus.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import mash.masharium.api.bonus.constant.OperationStatus;
 import mash.masharium.api.bonus.constant.OperationType;
@@ -16,6 +17,7 @@ public class OperationResponseDto {
 
     Integer summa;
 
+    @JsonFormat(pattern = "yyyy-MM-dd dd-HH-mm")
     LocalDateTime time;
 
     OperationStatus status;

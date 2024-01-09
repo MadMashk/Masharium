@@ -14,5 +14,5 @@ public interface PositionService {
 
     Position save(Position entity);
 
-    Set<Position> calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(List<PositionRequestDto> positionRequestDtos, Set<Position> positions, Order order);
+    Set<Position> calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(List<PositionRequestDto> positionRequestDtos, Order order);
 }

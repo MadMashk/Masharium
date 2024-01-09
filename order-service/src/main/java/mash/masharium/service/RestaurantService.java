@@ -5,10 +5,12 @@ import mash.masharium.api.order.response.PositionResponseDto;
 import mash.masharium.entity.Order;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface RestaurantService {
 
-    void writeOffComponentsOfPositions(Order order, List<PositionRequestDto> positionRequestDtoList);
+    void writeOffComponentsOfPositions(Order order, Map<UUID, Integer> quantities);
 
     void accrualComponentsOfPositions(Order order);
 

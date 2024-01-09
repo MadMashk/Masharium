@@ -19,7 +19,7 @@ public class TicketController {
 
     private final TicketService ticketService;
 
-    @Operation(description = "Создание тикета", tags = "Тикеты")
+    @Operation(description = "Создание тикета", tags = "Тикеты", hidden = true)
     @PostMapping
     public void create(@RequestBody TicketRequestDto dto) {
         ticketService.create(dto);
@@ -31,13 +31,19 @@ public class TicketController {
         return ticketService.getAll();
     }
 
+    @Operation(description = "Получение списка активных тикетов", tags = "Тикеты")
+    @GetMapping("/active")
+    public List<TicketResponseDto> getAllActive() {
+        return ticketService.getAllActive();
+    }
+
     @Operation(description = "Взять тикет в работу", tags = "Тикеты")
     @PatchMapping
     public void take(UUID ticketId, String mockToken) {
         ticketService.take(ticketId, mockToken);
     }
 
-    @Operation(description = "Завершить тикет тикета", tags = "Тикеты")
+    @Operation(description = "Завершить тикет", tags = "Тикеты")
     @PatchMapping("/completion")
     public void complete(UUID ticketId) {
         ticketService.complete(ticketId);

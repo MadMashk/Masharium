@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <include file="2024-01-02/create-table-TICKET.xml" relativeToChangelogFile="true"/>
-    <include file="2024-01-02/create-table-TICKET_DISH.xml" relativeToChangelogFile="true"/>
+    <include file="2024-01-02/create-table-tickets.xml" relativeToChangelogFile="true"/>
+    <include file="2024-01-02/create-table-ticket_dishes.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

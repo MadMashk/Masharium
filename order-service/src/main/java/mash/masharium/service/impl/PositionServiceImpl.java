@@ -1,10 +1,12 @@
 package mash.masharium.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mash.masharium.api.order.request.PositionRequestDto;
 import mash.masharium.api.order.response.PositionResponseDto;
 import mash.masharium.entity.Order;
 import mash.masharium.entity.Position;
+import mash.masharium.exception.model.NotFoundException;
 import mash.masharium.repository.PositionRepository;
 import mash.masharium.service.PositionService;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PositionServiceImpl implements PositionService {
@@ -24,13 +27,17 @@ public class PositionServiceImpl implements PositionService {
     @Transactional
     public List<PositionResponseDto> subtract(List<PositionRequestDto> positionRequestDtos, Order order) {
         Set<Position> positions = order.getPositions();
-        return positionRequestDtos
-                .stream()
-                .map(positionDto -> subtractRequest(positions
-                        .stream()
-                        .filter(positionEntity -> positionEntity.getId().equals(positionDto.getId()))
-                        .findFirst().get(), positionDto))
-                .toList();
+        try {
+            return positionRequestDtos
+                    .stream()
+                    .map(positionDto -> subtractRequest(positions
+                            .stream()
+                            .filter(positionEntity -> positionEntity.getDishId().equals(positionDto.getId()))
+                            .findFirst().get(), positionDto))
+                    .toList();
+        } catch (NoSuchElementException e) {
+            throw new NotFoundException("В заказе " + order.getId() + " отсутствуют указанные позиции");
+        }
     }
 
     @Override
@@ -39,23 +46,32 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
-    public Set<Position> calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(List<PositionRequestDto> positionRequestDtos, Set<Position> positions, Order order) {
+    public Set<Position> calculateNewVolumeOfAlreadyExistPositionsAndGetNewPositions(List<PositionRequestDto> positionRequestDtos, Order order) {
+        Set<Position> positions = order.getPositions();
         return new HashSet<>(positionRepository.saveAll(positionRequestDtos
                 .stream()
-                .peek(position -> {
+                .peek(positionDto -> {
                     Optional<Position> foundPosition = positions
                             .stream()
-                            .filter(orderPosition -> orderPosition.getId().equals(position.getId()))
+                            .filter(position -> position.getDishId().equals(positionDto.getId()))
                             .findFirst();
-                    foundPosition.ifPresent(value -> position.setQuantity(position.getQuantity() + value.getQuantity()));
+                    foundPosition.ifPresent(value -> value.setQuantity(positionDto.getQuantity() + value.getQuantity()));
                 })
-                .map(position -> {
-                    Position entity = new Position();
-                    entity.setId(position.getId());
-                    entity.setOrderId(order.getId());
-                    entity.setCost(position.getCost());
-                    entity.setQuantity(position.getQuantity());
-                    return entity;
+                .map(dto -> {
+                    Optional<Position> foundPosition = positions
+                            .stream()
+                            .filter(position -> position.getDishId().equals(dto.getId()))
+                            .findFirst();
+                    if (foundPosition.isPresent()) {
+                        return foundPosition.get();
+                    } else {
+                        Position entity = new Position();
+                        entity.setDishId(dto.getId());
+                        entity.setOrderId(order.getId());
+                        entity.setCost(dto.getCost());
+                        entity.setQuantity(dto.getQuantity());
+                        return entity;
+                    }
                 }).collect(Collectors.toSet())));
     }
 

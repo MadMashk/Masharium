@@ -4,8 +4,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
-    <changeSet id="create-table-TICKET_DISH" author="Maria Musorina">
-        <createTable tableName="TICKET_DISH">
+    <changeSet id="create-table-ticket_dishes" author="Maria Musorina">
+        <createTable tableName="ticket_dishes">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -15,10 +15,13 @@
             <column name="ticket_id" type="uuid">
                 <constraints nullable="false"/>
             </column>
+            <column name="quantity" type="integer">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="TICKET_DISH" baseColumnNames="ticket_id" constraintName="fk_ticket_ticket_dish"
-                                 referencedTableName="TICKET"
+        <addForeignKeyConstraint baseTableName="ticket_dishes" baseColumnNames="ticket_id" constraintName="fk_ticket_ticket_dishes"
+                                 referencedTableName="tickets"
                                  referencedColumnNames="id"/>
     </changeSet>
 

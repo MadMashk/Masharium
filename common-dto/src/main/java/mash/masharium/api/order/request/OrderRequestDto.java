@@ -14,9 +14,9 @@ public class OrderRequestDto {
 
     private UUID clientId;
 
-    private String address;
+    private UUID waiterId;
 
-    private Boolean isAuth;
+    private String address;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private OrderStatus status;

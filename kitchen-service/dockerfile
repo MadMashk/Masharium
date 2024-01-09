@@ -1,6 +1,5 @@
-FROM openjdk:11
-ARG WAR_FILE=./target/poker-*.war
-ARG RUN_OPTS=$RUN_OPTS
-COPY ${WAR_FILE} app.war
+FROM openjdk:17
+ARG JAR_FILE=./target/kitchen-*.jar
+COPY ${JAR_FILE} app.jar
 EXPOSE 8083
-CMD java -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 app.war $RUN_OPTS
+ENTRYPOINT ["java","-jar","/app.jar"]

@@ -62,6 +62,12 @@ public class ComponentServiceImpl implements ComponentService {
         return changeQuantity(componentQuantityToWriteOffMap, componentQuantityChangingOperation, BigDecimal::add);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Component> getAll() {
+        return componentRepository.findAll();
+    }
+
     private List<ComponentDto> changeQuantity(Map<Component, BigDecimal> componentQuantityToWriteOffMap,
                                               ComponentQuantityChangingOperation componentQuantityChangingOperation,
                                               BinaryOperator<BigDecimal> mathFunction) {

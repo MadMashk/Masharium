@@ -16,6 +16,8 @@
         <projectlombok.version>1.18.26</projectlombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <jwt.version>4.3.0</jwt.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
@@ -71,6 +73,17 @@
         <artifactId>java-jwt</artifactId>
         <version>${jwt.version}</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+    <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>5.2.5</version>
+    </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.0-rc1</version>
+        </dependency>
     </dependencies>
 
 </project>

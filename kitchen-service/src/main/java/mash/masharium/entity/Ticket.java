@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "TICKET")
+@Table(name = "tickets")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Ticket {
 

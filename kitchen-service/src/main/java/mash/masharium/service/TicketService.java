@@ -14,4 +14,6 @@ public interface TicketService {
     void take(UUID ticketId, String token);
 
     void complete(UUID ticketId);
+
+    List<TicketResponseDto> getAllActive();
 }

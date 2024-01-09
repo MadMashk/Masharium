@@ -11,7 +11,7 @@ import java.util.UUID;
 @FeignClient(value = "parameters", url = "#{clientProperties.bonusServiceUrl}")
 public interface BonusServiceParametersClient {
 
-    @GetMapping("/name")
+    @GetMapping("/parameters/name")
     String getParameter(@RequestParam String parameterName);
 
 }

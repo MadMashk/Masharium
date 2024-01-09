@@ -50,7 +50,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setTicketStatus(TicketStatus.NEW);
         ticket.setOrderId(dto.getOrderId());
         ticketRepository.save(ticket);
-        ticketDishService.saveAll(dto.getDishIds(), ticket);
+        ticketDishService.saveAll(dto.getDishes(), ticket);
     }
 
     @Override
@@ -80,6 +80,12 @@ public class TicketServiceImpl implements TicketService {
         ticket.setTicketStatus(TicketStatus.DONE);
         //отправиться на сервис заказов чтоб поменять статус там
         changeOrderStatus(ticket, OrderStatus.READY_FOR_DELIVERY);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TicketResponseDto> getAllActive() {
+        return ticketMapper.toListDto(ticketRepository.findAllActive());
     }
 
     private void changeOrderStatus(Ticket ticket, OrderStatus inProgress) {

@@ -1,0 +1,5 @@
+FROM openjdk:17
+ARG JAR_FILE=./target/common-dto-1.0-SNAPSHOT.jar
+ARG RUN_OPTS=$RUN_OPTS
+COPY ${JAR_FILE} app.jar
+CMD java -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 app.jar $RUN_OPTS
