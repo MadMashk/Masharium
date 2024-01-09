@@ -6,11 +6,12 @@ services:
       - "8080:8080"
     depends_on:
       - account_db
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5430/auth_db
   account_db:
     container_name: auth_db
     image: postgres:latest
     environment:
-      - DB_URL=jdbc:postgresql://host.docker.internal:5430/auth_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=auth_db
@@ -23,11 +24,12 @@ services:
       - "8081:8081"
     depends_on:
       - order_db
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5431/order_db
   order_db:
     container_name: order_db
     image: postgres:latest
     environment:
-      - DB_URL=jdbc:postgresql://host.docker.internal:5431/order_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=order_db
@@ -40,11 +42,12 @@ services:
       - "8083:8083"
     depends_on:
       - kitchen_db
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5433/kitchen_db
   kitchen_db:
     container_name: kitchen_db
     image: postgres:latest
     environment:
-      - DB_URL=jdbc:postgresql://host.docker.internal:5433/kitchen_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=kitchen_db
@@ -57,11 +60,12 @@ services:
       - "8084:8084"
     depends_on:
       - restaurant_db
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5434/restaurant_db
   restaurant_db:
     container_name: restaurant_db
     image: postgres:latest
     environment:
-      - DB_URL=jdbc:postgresql://host.docker.internal:5434/restaurant_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=restaurant_db
@@ -74,11 +78,12 @@ services:
       - "8085:8085"
     depends_on:
       - bonus_db
+    environment:
+      - DB_URL=jdbc:postgresql://host.docker.internal:5435/bonus_db
   bonus_db:
     container_name: bonus_db
     image: postgres:latest
     environment:
-      - DB_URL=jdbc:postgresql://host.docker.internal:5435/bonus_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=masha
       - POSTGRES_DB=bonus_db
