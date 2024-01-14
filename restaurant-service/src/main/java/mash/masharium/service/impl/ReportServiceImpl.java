@@ -56,7 +56,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public byte[] getExpectedDishNumbers(Integer quantityOfMonthsForAnalyzeStatistic) {
         LocalDate firstDate = LocalDate.now().minusDays(1).minusMonths(quantityOfMonthsForAnalyzeStatistic);
-        LocalDate secondDate = LocalDate.now().minusDays(1);
+        LocalDate secondDate = LocalDate.now();
         Long quantityOfDays = ChronoUnit.DAYS.between(firstDate, secondDate);
         List<Dish> dishes = dishService.getAll();
         Map<UUID, Integer> frequencyOfDishes = orderService.getFrequency(firstDate, secondDate);
@@ -66,27 +66,27 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public byte[] getExpectedProductVolumes(Integer quantityOfMonthsForAnalyzeStatistic) {
         LocalDate firstDate = LocalDate.now().minusDays(1).minusMonths(quantityOfMonthsForAnalyzeStatistic);
-        LocalDate secondDate = LocalDate.now().minusDays(1);
+        LocalDate secondDate = LocalDate.now();
         Long quantityOfDays = ChronoUnit.DAYS.between(firstDate, secondDate);
         List<Dish> dishes = dishService.getAll();
         Map<UUID, Dish> uuidDishMap = dishes.stream().collect(Collectors.toMap(Dish::getId, dish -> dish));
         Map<UUID, Integer> frequencyOfDishes = orderService.getFrequency(firstDate, secondDate);
-        Map<UUID, Integer> frequencyOfProducts = new HashMap<>();
+        Map<UUID, BigDecimal> frequencyOfProducts = new HashMap<>();
         List<Component> components = componentService.getAll();
         frequencyOfDishes.keySet().forEach(key -> {
             Dish dish = uuidDishMap.get(key);
             dish.getDishComponents().forEach(component -> {
                 if (frequencyOfProducts.containsKey(component.getComponent().getId())) {
-                    frequencyOfProducts.put(component.getComponent().getId(), frequencyOfProducts.get(component.getComponent().getId()) + component.getQuantity().intValue() * frequencyOfDishes.get(key));
+                    frequencyOfProducts.put(component.getComponent().getId(), frequencyOfProducts.get(component.getComponent().getId()).add(component.getQuantity()).multiply(BigDecimal.valueOf(frequencyOfDishes.get(key))));
                 } else {
-                    frequencyOfProducts.put(component.getComponent().getId(), component.getQuantity().intValue() * frequencyOfDishes.get(key));
+                    frequencyOfProducts.put(component.getComponent().getId(), component.getQuantity().multiply(BigDecimal.valueOf(frequencyOfDishes.get(key))));
                 }
             });
         });
         return generateExpectedComponentNumbersReport(components, frequencyOfProducts, quantityOfDays);
     }
 
-    private byte[] generateExpectedComponentNumbersReport(List<Component> components, Map<UUID, Integer> frequencyOfProducts, Long quantityOfDays) {
+    private byte[] generateExpectedComponentNumbersReport(List<Component> components, Map<UUID, BigDecimal> frequencyOfProducts, Long quantityOfDays) {
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet("Статистика ежедневных трат каждого продукта");
         Row headerRow = sheet.createRow(0);
@@ -165,11 +165,11 @@ public class ReportServiceImpl implements ReportService {
         row.createCell(2).setCellValue(BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(quantityOfDays), 3, RoundingMode.HALF_UP).toString());
     }
 
-    private void putExpectedComponentData(Component component, Map<UUID, Integer> frequency, Long quantityOfDays, Row row) {
-        Integer amount = frequency.getOrDefault(component.getId(), 0);
+    private void putExpectedComponentData(Component component, Map<UUID, BigDecimal> frequency, Long quantityOfDays, Row row) {
+        BigDecimal amount = frequency.getOrDefault(component.getId(), BigDecimal.ZERO);
         row.createCell(0).setCellValue(component.getName());
-        row.createCell(1).setCellValue(amount);
-        row.createCell(2).setCellValue(BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(quantityOfDays), 3, RoundingMode.HALF_UP).toString());
+        row.createCell(1).setCellValue(amount.floatValue());
+        row.createCell(2).setCellValue(amount.divide(BigDecimal.valueOf(quantityOfDays), 3, RoundingMode.HALF_UP).toString());
     }
 
     private byte[] generateReport(BigDecimal generalVolume, Map<LocalDate, BigDecimal> volumes) {

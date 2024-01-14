@@ -124,6 +124,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(getNotFoundExceptionDueToOrderSupplier(orderId));
         BigDecimal bonusPercent = Objects.nonNull(order.getClientId()) ? getBonusPercent() : BigDecimal.ZERO;
         Integer totalAmountOfBonusesToAccrue = order.getTotalPrice().multiply(bonusPercent).intValue();
+        removeQuartzTrigger(order);
         if (Objects.nonNull(order.getClientId())) {
             bonusService.accrual(order, totalAmountOfBonusesToAccrue);
         }
